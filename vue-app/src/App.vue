@@ -1,88 +1,53 @@
-<script setup>
-
-</script>
-
 <template>
-  
-
-  <main>
-    <h1>{{ title }}</h1>
-    <div v-if="showModal">
-      <Modal  :theme="sale" @close="toggleModal">
-        <template v-slot:links>
-          <a href="#">sign up now</a>
-          <a href="#">more info</a>
-        </template>
-        <h1>ninja giveaway</h1>
-        <p>grab your swag</p>
-      </Modal>
-    </div>
-
-
-    <div v-if="showModalTwo">
-      <Modal   @close="toggleModalTwo">
-        <h1>sign up to the newsletter</h1>
-        <p>fuck you!</p>
-      </Modal>
-    </div>
-    <button @click="toggleModal">Open modal</button>
-    <button @click="toggleModalTwo">Open modal</button>
-  </main>
+  <Header />
+  <div class="container">
+    <Balance :total="total"/>
+    <IncomeExpenses :income="+income" :expenses="+expenses"/>
+    <TransactionList :transactions="transactions"/>
+    <AddTransaction />
+  </div>
 </template>
 
-<script>
-import Modal from "./components/Modal.vue"
+<script setup>
+    import Header from './components/Header.vue';
+    import Balance from './components/Balance.vue';
+    import IncomeExpenses from './components/IncomeExpenses.vue';
+    import TransactionList from './components/TransactionList.vue';
+    import AddTransaction from './components/AddTransaction.vue';
 
-export default {
-  name: 'App',
-  components: { Modal },
-  data() {
-    return {
-      title: 'my First vue app :)',
-      showModal: false,
-      showModalTwo: false,
-    }
-  },
-  methods: {
-    toggleModal() {
-      this.showModal = !this.showModal
-    },
-    toggleModalTwo() {
-      this.showModalTwo = !this.showModalTwo
-    },
-  }
-}
+    import {  ref, computed  } from 'vue';
+    
+    const transactions = ref([
+                { id: 1, text: 'Flower', amount: -19.99},
+                { id: 2, text: 'Salary', amount: 299.97},
+                { id: 3, text: 'Book', amount: -10},
+                { id: 4, text: 'Camera', amount: 150}
+            ]);
+
+  //get total
+    const total = computed(() => {
+      return transactions.value.reduce((acc, transaction) => {
+        return acc + transaction.amount
+      }, 0);
+    });
+
+//  get income
+    const income = computed(() => {
+          return transactions.value
+          .filter((transaction) => transaction.amount > 0)
+          .reduce((acc, transaction) => {
+            return acc + transaction.amount
+          }, 0)
+          .toFixed(2);
+        });
+//  get expenses
+
+    const expenses = computed(() => {
+          return transactions.value
+          .filter((transaction) => transaction.amount < 0)
+          .reduce((acc, transaction) => {
+            return acc + transaction.amount
+          }, 0)
+          .toFixed(2);
+        });
 </script>
-
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-h1 {
-  color: red;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
